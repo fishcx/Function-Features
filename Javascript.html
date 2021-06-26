@@ -1,0 +1,1116 @@
+<script>
+	$(document).ready(function() {
+    
+    $('.changeItem').change(function(){
+        $('#generate').click();
+    });
+
+    $(document).keypress(function (e) {
+        var key = e.which;
+         if(key == 13)  // the enter key code
+         {
+            $('#generate').click();
+             return false;  
+          }
+    });
+    
+    $('#video-button').hide();
+    
+    var testing = false;
+    $('#generate').click(function(){
+        if(!testing){$("#answer").hide(); $("#show-answer").val("Show Answer");}
+        $('#plot').hide();
+        generate(parseInt($("#type").val()));       
+     });
+
+
+    $("#show-answer").click(function(){
+       if($("#answer").is(":hidden") ){
+          $("#answer").show();
+          $("#show-answer").val("Hide Answer");
+       } else{
+         $("#answer").hide();
+         $("#show-answer").val("Show Answer");
+        }
+    });
+     
+    if(testing){ $("#answer").show();}
+
+	});
+	function generate(type){
+       
+       var videoLinks = ["https://www.youtube.com/watch?v=BQJ4zYn8Z5g",
+                         "https://www.youtube.com/watch?v=uM6Dp818ED0",
+                         "https://www.youtube.com/watch?v=K3DgPpVIqF4",
+                         "https://www.youtube.com/watch?v=XX8zD2BTpwU",
+                         "https://www.youtube.com/watch?v=fM9JsvhOBBI",
+                         "https://www.youtube.com/watch?v=fGRQHaJrjkU",
+                         "https://www.youtube.com/watch?v=n0LU21OnOyQ"];
+       
+       if(videoLinks[type-1].length != 0){ 
+         $("#videoLink"). attr("href", videoLinks[type-1]);
+         $('#video-button').show();
+       }
+       else{
+         $('#video-button').hide();
+       }
+       
+       
+       var problem = "";
+       var answer = "";
+       var a,b,c,d,e,f,g,h,func;
+       
+       // generate different values for each 
+       a = random(-10,10); 
+           do{ b = random(-10,10); } while(a == b);
+           do{ c = random(-10,10); } while(a == c || b == c);
+           do{ d = random(-10,10); } while(a == d || b == d || c == d);
+           do{ e = random(-10,10); } while(a == e || b == e || c == e || d == e);
+           do{ f = random(-10,10); } while(a == f || b == f || c == f || d == f || e == f);
+           do{ g = random(-10,10); } while(a == g || b == g || c == g || d == g || e == g || f == g);
+           do{ h = random(-10,10); } while(a == h || b == h || c == h || d == h || e == h || f == h || g == h);
+ 
+       $("#generated").html("");
+       $("#answer").html("");
+       
+       switch(type) {
+           // Is it a function?
+           case 1: 
+           switch(random(0,20)){
+               // yes coordinates in set notation
+               case 0:
+               problem = "\\(\\{("+a+","+b+"), ("+b+","+c+"), ("+h+","+c+"), ("+e+","+f+"), ("+g+","+d+"), ("+c+","+b+"), ("+d+","+h+")\\}\\)";               
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               case 1:
+               problem = "\\(\\{("+a+","+b+"), ("+d+","+e+"), ("+h+","+c+"), ("+e+","+f+"), ("+g+","+d+"), ("+c+","+b+"), ("+f+","+h+")\\}\\)";               
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               case 2:
+               problem = "\\(\\{("+a+","+b+"), ("+h+","+a+"), ("+d+","+c+"), ("+e+","+f+"), ("+g+","+d+"), ("+c+","+b+"), ("+f+","+h+")\\}\\)";            
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               case 3:
+               problem = "\\(\\{("+a+","+b+"), ("+d+","+e+"), ("+b+","+c+"), ("+e+","+f+"), ("+g+","+d+"), ("+c+","+b+"), ("+f+","+h+")\\}\\)";               
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               // no coordinates in set notation
+               case 4:
+               problem = "\\(\\{("+a+","+b+"), ("+d+","+e+"), ("+h+","+c+"), ("+e+","+f+"), ("+a+","+d+"), ("+c+","+b+"), ("+f+","+h+")\\}\\)";               
+               answer = "No, this is not a function since the input of \\("+a+"\\) repeats with different outputs";
+               break;
+               
+               case 5:
+               problem = "\\(\\{("+b+","+b+"), ("+d+","+e+"), ("+a+","+c+"), ("+e+","+f+"), ("+g+","+d+"), ("+c+","+b+"), ("+a+","+h+")\\}\\)";
+               answer = "No, this is not a function since the input of \\("+a+"\\) repeats with different outputs";
+               break;
+               
+               case 6:
+               problem = "\\(\\{("+b+","+b+"), ("+d+","+e+"), ("+a+","+c+"), ("+e+","+f+"), ("+g+","+d+"), ("+a+","+b+"), ("+f+","+h+")\\}\\)";               
+               answer = "No, this is not a function since the input of \\("+a+"\\) repeats with different outputs";
+               break;
+               
+               // yes table
+               case 7:
+               problem = "<table border='1'>"
+               problem += "<tr><td>\\(x\\)</td><td>"+a+"</td><td>"+b+"</td><td>"+h+"</td><td>"+e+"</td><td>"+g+"</td><td>"+c+"</td><td>"+d+"</td></tr>";
+               problem += "<tr><td>\\(y\\)</td><td>"+b+"</td><td>"+c+"</td><td>"+c+"</td><td>"+f+"</td><td>"+d+"</td><td>"+b+"</td><td>"+h+"</td></tr>";
+               problem += "</table>";                              
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               case 8:             
+               problem = "<table border='1'>"
+               problem += "<tr><td>\\(x\\)</td><td>"+a+"</td><td>"+d+"</td><td>"+h+"</td><td>"+e+"</td><td>"+g+"</td><td>"+c+"</td><td>"+f+"</td></tr>";
+               problem += "<tr><td>\\(y\\)</td><td>"+b+"</td><td>"+e+"</td><td>"+c+"</td><td>"+f+"</td><td>"+d+"</td><td>"+b+"</td><td>"+h+"</td></tr>";
+               problem += "</table>";
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               case 9:
+               problem = "<table border='1'>"
+               problem += "<tr><td>\\(x\\)</td><td>"+a+"</td><td>"+h+"</td><td>"+d+"</td><td>"+e+"</td><td>"+g+"</td><td>"+c+"</td><td>"+f+"</td></tr>";
+               problem += "<tr><td>\\(y\\)</td><td>"+b+"</td><td>"+a+"</td><td>"+c+"</td><td>"+f+"</td><td>"+d+"</td><td>"+b+"</td><td>"+h+"</td></tr>";
+               problem += "</table>";
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               case 10:
+               problem = "<table border='1'>"
+               problem += "<tr><td>\\(x\\)</td><td>"+a+"</td><td>"+d+"</td><td>"+b+"</td><td>"+e+"</td><td>"+g+"</td><td>"+c+"</td><td>"+f+"</td></tr>";
+               problem += "<tr><td>\\(y\\)</td><td>"+b+"</td><td>"+e+"</td><td>"+c+"</td><td>"+f+"</td><td>"+d+"</td><td>"+b+"</td><td>"+h+"</td></tr>";
+               problem += "</table>";               
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\).";
+               break;
+               
+               // no table
+               case 11:
+               problem = "<table border='1'>"
+               problem += "<tr><td>\\(x\\)</td><td>"+a+"</td><td>"+d+"</td><td>"+h+"</td><td>"+e+"</td><td>"+a+"</td><td>"+c+"</td><td>"+f+"</td></tr>";
+               problem += "<tr><td>\\(y\\)</td><td>"+b+"</td><td>"+e+"</td><td>"+c+"</td><td>"+f+"</td><td>"+d+"</td><td>"+b+"</td><td>"+h+"</td></tr>";
+               problem += "</table>";               
+               answer = "No, this is not a function since the input of \\("+a+"\\) repeats with different outputs";
+               break;
+               
+               case 12:
+               problem = "<table border='1'>"
+               problem += "<tr><td>\\(x\\)</td><td>"+b+"</td><td>"+d+"</td><td>"+a+"</td><td>"+e+"</td><td>"+g+"</td><td>"+c+"</td><td>"+a+"</td></tr>";
+               problem += "<tr><td>\\(y\\)</td><td>"+b+"</td><td>"+e+"</td><td>"+c+"</td><td>"+f+"</td><td>"+d+"</td><td>"+b+"</td><td>"+h+"</td></tr>";
+               problem += "</table>";               
+               answer = "No, this is not a function since the input of \\("+a+"\\) repeats with different outputs";
+               break;
+               
+               case 13:
+               problem = "<table border='1'>"
+               problem += "<tr><td>\\(x\\)</td><td>"+b+"</td><td>"+d+"</td><td>"+a+"</td><td>"+e+"</td><td>"+g+"</td><td>"+a+"</td><td>"+f+"</td></tr>";
+               problem += "<tr><td>\\(y\\)</td><td>"+b+"</td><td>"+e+"</td><td>"+c+"</td><td>"+f+"</td><td>"+d+"</td><td>"+b+"</td><td>"+h+"</td></tr>";
+               problem += "</table>";               
+               answer = "No, this is not a function since the input of \\("+a+"\\) repeats with different outputs";
+               break;
+               
+               // graphs
+               // graph of a line -> yes
+               case 14:
+               var line = getLinear();
+               var exp = line.n/line.d+"x + "+line.b;
+               draw(exp,false);
+               $('#plot').show();
+               problem = "";
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
+               break;
+               
+               // graph of a quadratic -> yes
+               case 15:
+               a = non_zero_random(-3,3);
+               b = random(-5,5);
+               c = random(-5,5);
+               var exp = a+"x^2 + "+b+"x +"+c;
+               draw(exp,false);
+               $('#plot').show();
+               problem = "";
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
+               break;
+               
+               // graph of a circle -> no
+               case 16:
+               var r;
+               do{
+                 a = random(-5,5);
+                 b = random(-5,5);
+                 r = random(2,5);               
+               } while(((a+r)>10) || ((a-r)<-10) || ((b+r)>10) || ((b-r)<-10));
+               var exp = "("+r+"^2 - (x-"+a+")^2)^0.5+"+b;               
+               var exp2 = "-("+r+"^2 - (x-"+a+")^2)^0.5+"+b;
+               drawMultiple(exp,exp2);        
+               $('#plot').show();
+               problem = "";
+               answer = "No, this is not a function. It fails the vertical line test since at least one \\(x\\) value has multiple \\(y\\) values.";
+               break;
+               
+               // half a circle -> yes
+               case 17:
+               var r;
+               do{
+                 a = random(-5,5);
+                 b = random(-5,5);
+                 r = random(2,5);               
+               } while(((a+r)>10) || ((a-r)<-10) || ((b+r)>10) || ((b-r)<-10));
+               var exp = "("+r+"^2 - (x-"+a+")^2)^0.5+"+b;      
+               draw(exp);        
+               $('#plot').show();
+               problem = "";
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
+               break;
+               
+               // exponential -> yes
+               case 18:
+               a = non_zero_random(-5,5);
+               b = random(1,5);
+               c = random(1,9);
+               var exp = a+"*("+b+"/"+c+")^x";      
+               draw(exp);        
+               $('#plot').show();
+               problem = "";
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
+               break;
+               
+               // 2 exponentials -> no
+               case 19:
+               a = non_zero_random(-5,5);
+               b = random(1,5);
+               c = random(1,9);
+               var exp = a+"*("+b+"/"+c+")^x"; 
+               var exp2 = "-1*"+a+"*("+b+"/"+c+")^x";
+               drawMultiple(exp,exp2);        
+               $('#plot').show();
+               problem = "";
+               answer = "No, this is not a function. It fails the vertical line test since at least one \\(x\\) value has multiple \\(y\\) values.";
+               break;
+               
+               // cubic -> yes
+               case 20:
+               a = non_zero_random(-3,3);
+               b = random(-5,5);
+               c = random(-5,5);
+               var exp = a+"x^3 + "+b+"x +"+c;
+               draw(exp,false);
+               $('#plot').show();
+               problem = "";
+               answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
+               break;
+           
+           }
+           
+           break;
+           
+           // Evaluating function values
+           case 2:
+           func = generateForEval();
+           problem = "Evaluate \\(f(x) = "+func.functionPrinted+"\\) at \\(x = "+func.input1+"\\)";
+           answer = "\\(f("+func.input1+") = "+func.answer1+"\\)";
+           
+           break;
+		  
+           // Domain and Range
+           case 3: 
+           func = generateFunction();
+           problem = "Determine the domain and range for the function <br>";
+           problem += "\\(g(x) = "+func.functionPrinted+"\\)";
+           answer = "Domain: \\("+func.domain+"\\), Range: \\("+func.range+"\\)<br>";
+          
+           break;
+		   
+           // Increasing and Decreasing
+           case 4:
+           func = generateFunction();
+           problem = "Determine the increasing and decreasing intervals for the function <br>";
+           problem += "\\(g(x) = "+func.functionPrinted+"\\)";
+           answer = "Increasing: \\("+func.increasing+"\\), Decreasing: \\("+func.decreasing+"\\)";
+          
+           break;
+           
+           // Transformations
+           case 5:
+           func = generateFunction();
+           problem = "Determine the parent function and transformations for the function <br>";
+           problem += "\\(g(x) = "+func.functionPrinted+"\\)";
+           answer = "Parent function: \\(f(x)="+func.parent+"\\)<br>";
+           answer += "Transformations: "+func.transforms+"<br>";
+           
+           break;
+           
+           // Rate of Change
+           case 6:
+           func = generateForEval(); 
+           problem = "Determine the rate of change of \\(f(x) = "+func.functionPrinted+"\\) over the interval \\("+func.input1+"\\leq x \\leq "+func.input2+"\\)";
+           answer = "\\(f("+func.input1+") = "+func.answer1+"\\), ";
+           answer += "\\(f("+func.input2+") = "+func.answer2+"\\)<br>";
+           answer += "Rate of Change = \\(\\frac{"+func.answer2+" - "+func.answer1+"}{"+func.input2+" - "+func.input1+"}=\\frac{"+(func.answer2-func.answer1)+"}{"+(func.input2-func.input1)+"} = ";
+           answer += simplifyFrac((func.answer2-func.answer1),(func.input2-func.input1))+"\\)";
+           break;
+           
+           // All Key Features
+           case 7:
+           func = generateFunction();
+           problem = "Determine the parent function, transformations, domain, range, and increasing and decreasing intervals for the function <br>";
+           problem += "\\(g(x) = "+func.functionPrinted+"\\)";
+           answer = "Parent function: \\(f(x)="+func.parent+"\\)<br>";
+           answer += "Transformations: "+func.transforms+"<br>";
+           answer += "Domain: \\("+func.domain+"\\), Range: \\("+func.range+"\\)<br>";
+           answer += "Increasing: \\("+func.increasing+"\\), Decreasing: \\("+func.decreasing+"\\)";
+          
+           break;
+       }
+            
+       $("#generated").html(problem);
+       $("#answer").html(answer);
+       renderMathInElement(document.body);
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"generated"]);
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
+	}
+	
+    // generates a function using transformations 
+    function generateFunction(){
+    
+       var output = {functionPrinted:"", parent: "", domain: "", range: "", increasing: "", decreasing: "", transforms: ""};
+       var func = "";
+       var parent = "";
+       var trans = "";
+       var domain = "";
+       var range = "";
+       var inc = "";
+       var dec = "";
+
+      var refl = ""; // reflection over x-axis
+      switch(random(0,1)){ 
+       
+          case 0: 
+             refl = "yes";
+             trans += "Reflection over the \\(x\\)-axis;";
+             func += "-";
+
+          break; 
+          
+          case 1: refl = 0; break;
+          
+      }
+      
+      var vS = ""; // vertical strech
+      switch(random(0,1)){ 
+       
+          case 0: 
+             vS = non_zero_random(2,6); 
+             trans += " Vertical stretch times "+vS+";";
+             func += vS;
+
+          break; 
+          
+          case 1: vS = "none"; break;
+          
+      }
+      
+      var hT = ""; // horizontal transformation
+       switch(random(0,1)){ 
+       
+          case 0: 
+             hT = non_zero_random(-5,5); 
+             trans += " Horizontal shift ";
+           
+          if(hT > 0){ trans += "left ";} else { trans += "right ";}
+          
+          trans += Math.abs(hT)+" units; ";
+          
+          break; 
+          
+          case 1: hT = 0; break;
+          
+      }
+       
+       var vT = ""; // vertical transformation
+       switch(random(0,1)){ 
+       
+          case 0: 
+             vT = non_zero_random(-5,5); 
+             trans += " Vertical shift ";
+           
+          if(vT > 0){ trans += "up ";} else { trans += "down ";}
+          
+          trans += Math.abs(vT)+" units; ";
+          
+          break; 
+          
+          case 1: vT = 0; break;
+          
+      }
+      
+      switch(random(0,4)){
+      
+         case 0: // abs value
+         
+         parent = "|x|";
+         
+         if(hT != 0){ 
+            func += "|x + "+hT+"|";
+            
+            if(refl == 0){
+               inc = "("+(-1*hT)+", \\infty)";
+               dec = "(-\\infty ,"+(-1*hT)+")";
+            }
+            else{
+               dec = "("+(-1*hT)+", \\infty)";
+               inc = "(-\\infty ,"+(-1*hT)+")";
+            }
+         }
+         else{
+            func += "|x|";
+            if(refl == 0){
+               inc = "(0, \\infty)";
+               dec = "(-\\infty ,0)";
+            }
+            else{
+               dec = "(0, \\infty)";
+               inc = "(-\\infty ,0)";
+            }
+         }
+          
+         domain = "(-\\infty , \\infty)";
+         
+         if(vT != 0){ 
+            func += " + "+vT;
+         }
+         
+         if(refl == 0){
+         
+           range = "["+vT+", \\infty)";
+           
+         }
+         else{
+           
+           range = "(-\\infty , "+vT+"]";
+           
+         }
+
+         break;  // end absolute value
+
+         case 1: // quadratic
+         parent = "x^2";
+         
+         if(hT != 0){ 
+            func += "(x + "+hT+")^2";
+            
+            if(refl == 0){
+               inc = "("+(-1*hT)+", \\infty)";
+               dec = "(-\\infty ,"+(-1*hT)+")";
+            }
+            else{
+               dec = "("+(-1*hT)+", \\infty)";
+               inc = "(-\\infty ,"+(-1*hT)+")";
+            }
+         }
+         else{
+            func += "x^2";
+            if(refl == 0){
+               inc = "(0, \\infty)";
+               dec = "(-\\infty ,0)";
+            }
+            else{
+               dec = "(0, \\infty)";
+               inc = "(-\\infty ,0)";
+            }
+         }
+          
+         domain = "(-\\infty , \\infty)";
+         
+         if(vT != 0){ 
+            func += " + "+vT;
+         }
+         
+         if(refl == 0){
+         
+           range = "["+vT+", \\infty)";
+           
+         }
+         else{
+           range = "(-\\infty , "+vT+"]";
+         }
+         
+         break; // end quadratic
+         
+         case 2: // cubic
+         parent = "x^3";
+         if(hT != 0){ 
+            func += "(x + "+hT+")^3";
+         }
+         else{
+            func += "x^3";
+         }
+         
+         if(refl == 0){
+               inc = "(-\\infty , \\infty)";
+               dec = "\\)Never\\(";
+            }
+            else{
+               dec = "(-\\infty , \\infty)";
+               inc = "\\)Never\\(";
+            }
+          
+         domain = "(-\\infty , \\infty)";
+         
+         if(vT != 0){ 
+            func += " + "+vT;
+         }
+         
+         range = "(-\\infty , \\infty)";
+         
+         
+         break; // end cubic
+         
+         case 3: // square root
+         parent = "\\sqrt{x}";
+         
+         if(hT != 0){ 
+            func += "\\sqrt{x + "+hT+"}";
+
+         }
+         else{
+            func += "\\sqrt{x}";
+         }
+         
+         if(refl == 0){
+               inc = "("+(-1*hT)+", \\infty)";
+               dec = "\\)Never\\(";
+            }
+            else{
+               dec = "("+(-1*hT)+", \\infty)";
+               inc = "\\)Never\\(";
+            }
+          
+         domain = "["+(-1*hT)+" , \\infty)";
+         
+         if(vT != 0){ 
+            func += " + "+vT;
+         }
+         
+         if(refl == 0){
+         
+           range = "["+vT+", \\infty)";
+           
+         }
+         else{
+           
+           range = "(-\\infty , "+vT+"]";
+           
+         }
+         
+         break; // end square root
+         
+         case 4: // cubed root
+         parent = "\\sqrt[3]{x}";
+         
+         if(hT != 0){ 
+            func += "\\sqrt[3]{x + "+hT+"}";
+         }
+         else{
+            func += "\\sqrt[3]{x}";
+         }
+         
+         if(refl == 0){
+               inc = "(-\\infty , \\infty)";
+               dec = "\\)Never\\(";
+            }
+            else{
+               dec = "(-\\infty , \\infty)";
+               inc = "\\)Never\\(";
+            }
+          
+         domain = "(-\\infty , \\infty)";
+         
+         if(vT != 0){ 
+            func += " + "+vT;
+         }
+         
+         range = "(-\\infty , \\infty)";
+
+         break; // end cubed root
+      
+      }
+      output.parent = parent;
+      output.domain = domain;
+      output.range = range;
+      output.increasing = inc;
+      output.decreasing = dec;
+      output.functionPrinted = doublesigns(func);
+      if(trans == ""){ trans = "None"; }
+      output.transforms = trans;
+      
+      return output;
+    }
+    
+    // generates function with input and answer
+    function generateForEval(){
+    
+        var output = {functionPrinted:"", input1:"", answer1:"", input2:"", answer2:""};
+        var x1 = random(-10,10);
+        var x2 = random(1,10)+x1; 
+        
+        var fun = "";
+        var answer1 = "";
+        var answer2 = "";
+        
+        output.input1 = x1;
+        output.input2 = x2;
+                
+        var num1,num2,num3,num4,num5;
+           num1 = non_zero_random(-5,5);
+           num2 = non_zero_random(-5,5);
+           num3 = non_zero_random(-5,5);
+           num4 = non_zero_random(-5,5);
+           num5 = non_zero_random(-5,5);
+        
+        switch(random(0,3)){
+
+           case 0: 
+           fun = num1+"x^2 + "+num2+"x + "+num3;
+           answer1 = num1*(x1**2)+num2*x1+num3;
+           answer2 = num1*(x2**2)+num2*x2+num3;
+           
+           break;
+           
+           case 1:
+           fun = num4+"x^3 + "+num1+"x^2 + "+num2+"x + "+num3;
+           answer1 = num4*(x1**3)+num1*(x1**2)+num2*x1+num3;
+           answer2 = num4*(x2**3)+num1*(x2**2)+num2*x2+num3;
+           
+           break;
+        
+           case 2:
+           fun = num1+"|x| + "+num2;
+           answer1 = num1*Math.abs(x1)+num2;
+           answer2 = num1*Math.abs(x2)+num2;
+           
+           break;
+           
+           case 3:
+           fun = num1+"|x + "+num3+"| + "+num2;
+           answer1 = num1*Math.abs(x1+num3)+num2;
+           answer2 = num1*Math.abs(x2+num3)+num2;
+
+           break;
+
+        }
+        
+        // takes care of weird rounding errors
+        output.functionPrinted = doublesigns(fun);
+        output.answer1 = Math.round(answer1*100000)/100000;
+        output.answer2 = Math.round(answer2*100000)/100000;
+        
+        return output;
+    
+    }
+
+    
+    // removes all double signs
+    function doublesigns(string){
+       return string.replaceAll("-+", "-").replaceAll("- +", "-").replaceAll("+ -", "-").replaceAll("- -", "+").replaceAll("+-", "-").replaceAll("-- ", "+");
+    }
+    
+    String.prototype.replaceAll = function(searchStr, replaceStr) {
+	   var str = this;
+       // no match exists in string?
+       if(str.indexOf(searchStr) === -1) {
+          // return string
+          return str;
+       }
+      // replace and remove first match, and do another recursirve search/replace
+       return (str.replace(searchStr, replaceStr)).replaceAll(searchStr, replaceStr);
+    }
+    
+    // random integer between and including min and max
+	function random(min, max) {
+         return Math.floor(Math.random() * (max - min + 1) ) + min;
+    } 
+    
+    // random non-zero integer bewteen min and max
+    function non_zero_random(min, max) {
+         var output;
+         do{output = Math.floor(Math.random() * (max - min + 1) ) + min;} while (output === 0);  
+         return output;
+    } 
+    
+    function gcd(x, y) {
+       if ((typeof x !== 'number') || (typeof y !== 'number')) 
+       return false;
+         x = Math.abs(x);
+         y = Math.abs(y);
+      while(y) {
+        var t = y;
+        y = x % y;
+        x = t;
+      }
+      return x;
+     }
+    
+    
+    // simplify fraction
+    function simplifyFrac(num, denom){
+         
+     // format the negative better so that it isn't in a fraction
+     var neg = "";
+     if((num/denom) < 0){
+        
+        num = Math.abs(num);
+        denom = Math.abs(denom);
+        neg = "-";
+        
+     }
+       // if integer, return integer
+       if((num % denom) === 0){
+       
+         return neg+num/denom;
+         
+       }
+       // otherwise, return fraction in simplest form
+       else{
+            var g = gcd(num,denom);
+            return neg+"\\frac{"+(num/g)+"}{"+(denom/g)+"}";
+        }
+      }
+ 
+    // helper function for graphing to produce a line with a viable y-intercept and slope that'll fit in 10 by 10
+    function getLinear(){
+       var found = false;
+       var num, den, slope, yInt;
+       
+       do{
+           // generate values to be tested
+           yInt = random(-9,9); 
+           num = non_zero_random(-10,10);
+           den = non_zero_random(-5,5);
+           
+           // test to see if values produce another coordinate in 10 by 10 
+           for(var i = -9; i < 9; i++){
+           
+              var yVal = num/den*i+yInt;
+              
+              if(yVal > -10 && yVal < 10){
+                 
+                 found = true;
+              
+              }
+            
+           }
+       }
+       while(!found);
+       
+       return {n:num, d:den, b:yInt};
+    } 
+    
+ 
+    // function that draws the graph between -10 and 10
+    function draw(expression,showDots) {
+    try {
+      // compile the expression once
+      var expr = math.compile(expression)
+
+      // evaluate the expression repeatedly for different values of x
+      var xValues = math.range(-11, 11, 0.1).toArray();
+      const yValues = xValues.map(function (x) {
+        return expr.eval({x: x});
+      })
+      
+      if(showDots){
+      
+         var xValues2 = [];
+         var yValues2 = []
+         for(var i = 0; i < xValues.length; i ++){         
+            var yvalue = expr.eval({x: xValues[i]});
+
+               // creates the "pretty points" to graph points at integer y-values
+               if(Number.isInteger(yvalue) && Number.isInteger(xValues[i])){        
+                  xValues2.push(xValues[i]);
+                  yValues2.push(yvalue);        
+               }          
+         }    
+         
+      // render the "pretty points" using plotly
+      var trace2 = {
+        x: xValues2,
+        y: yValues2,
+        type: 'scatter',
+        mode: 'markers',
+        marker: {
+          color: '#3F4591',
+          size: 8
+        },
+        hoverinfo:'none'
+      };
+      }
+       
+      // render the line using plotly
+      var trace1 = {
+        x: xValues,
+        y: yValues,
+        type: 'scatter',
+        mode: 'lines',        
+        line: {
+          color: '#3F4591',
+          width: 2
+        },
+        name:"",
+      };
+   
+      var axis_template ={
+        showgrid: true,
+        zeroline: true,
+        nticks: 23,
+        range: [-11,11], 
+        gridcolor: '#bdbdbd', //grid color
+        gridwidth: 1.2, //grid width
+        zerolinecolor: 'black', // axes color
+        zerolinewidth: 1.5, // axes widths
+        showticklabels:false
+      };        
+      
+      // make grid smaller for mobile
+      var gridsize;
+      var indent;
+      // gridsize= Math.min(.95*window.innerWidth,550);
+      
+      if(window.innerWidth > 601){
+         gridsize = 550;
+         indent = 20;
+      }else{
+         gridsize = 350;
+         indent = 0;
+      }
+      
+      var xTickMarkLabels =   {
+        x: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        y: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"bottom",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };   
+      
+      var yTickMarkLabels =   {
+        y: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        x: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"left",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };
+      
+      var layout = {
+        xaxis:axis_template,
+        yaxis:axis_template,
+        showlegend: false,
+        width: gridsize,
+        height: gridsize,
+        hovermode: 'closest',   
+        font:{size: 18},
+        margin: {l: indent,  r: 30, t: 20}
+      };
+      
+      layout.annotations= [
+      {
+         x: 0,
+         y: 11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: 35
+       },
+       {
+         x: 0,
+         y: -11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: -35
+       },
+       {
+         x: 11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: -35,
+         ay: 0
+       },
+       {
+         x: -11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 35,
+         ay: 0
+       }
+
+     ];
+      
+      if(showDots){
+         var data = [trace1,trace2,xTickMarkLabels,yTickMarkLabels];
+      } else{
+         var data = [trace1,xTickMarkLabels,yTickMarkLabels];
+      }
+      Plotly.newPlot('plot', data, layout,{displayModeBar: false});
+    }
+    catch (err) {
+      console.error(err)
+      alert(err)
+    }
+  }
+  
+  // function that draws the graph between -10 and 10
+    function drawMultiple(expression1, expression2) {
+    try {
+      // compile the first expression
+      var expr = math.compile(expression1)
+
+      // evaluate the expression repeatedly for different values of x
+      var xValues = math.range(-11, 11, 0.01).toArray();
+      
+      // need to round these because of number types.  The values in the array weren't the exact decimals needed
+      for (var i = 0; i < xValues.length; i ++){         
+         xValues[i] = Math.round(xValues[i]*100)/100;         
+      }
+      
+      const yValues = xValues.map(function (x) {
+        if(isNumber(expr.eval({x: x}))){
+        return expr.eval({x: x});
+        }
+        else{ return ""; };
+      })       
+      // render the graph using plotly
+      var trace1 = {
+        x: xValues,
+        y: yValues,
+        type: 'scatter',
+        mode: 'lines',        
+        line: {
+          color: '#3F4591',
+          width: 2
+        },
+        name:"",
+      };
+      
+      // compile the second expression
+      var expr2 = math.compile(expression2)
+
+      // ok to use the same x values for both functions
+      const yValues2 = xValues.map(function (x) {
+        if(isNumber(expr2.eval({x: x}))){
+        return expr2.eval({x: x});
+        }
+        else{ return ""; };
+      })
+      
+      // render the second graph using plotly
+      var trace2 = {
+        x: xValues,
+        y: yValues2,
+        type: 'scatter',
+        mode: 'lines',        
+        line: {
+          color: '#3F4591',
+          width: 2
+        },
+        name:"",
+      };      
+      
+      var axis_template ={
+        showgrid: true,
+        zeroline: true,
+        nticks: 23,
+        range: [-11,11], 
+        gridcolor: '#bdbdbd', //grid color
+        gridwidth: 1.2, //grid width
+        zerolinecolor: 'black', // axes color
+        zerolinewidth: 1.5, // axes widths
+        showticklabels:false
+      };
+      
+      // make grid smaller for mobile
+      var gridsize;
+      var indent;
+      // gridsize= Math.min(.95*window.innerWidth,550);
+      
+      if(window.innerWidth > 601){
+         gridsize = 550;
+         indent = 20;
+      }else{
+         gridsize = 350;
+         indent = 0;
+      }
+      
+      var xTickMarkLabels =   {
+        x: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        y: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"bottom",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };   
+      
+      var yTickMarkLabels =   {
+        y: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        x: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"left",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };
+      
+      var layout = {
+        xaxis:axis_template,
+        yaxis:axis_template,
+        showlegend: false,
+        width: gridsize,
+        height: gridsize,
+        hovermode: 'closest',   
+        font:{size: 18},
+        margin: {l: indent,  r: 30, t: 20}
+      };
+      
+      layout.annotations= [
+      {
+         x: 0,
+         y: 11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: 35
+       },
+       {
+         x: 0,
+         y: -11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: -35
+       },
+       {
+         x: 11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: -35,
+         ay: 0
+       },
+       {
+         x: -11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 35,
+         ay: 0
+       }
+
+     ];
+      
+      var data = [trace1,trace2,xTickMarkLabels,yTickMarkLabels];
+      Plotly.newPlot('plot', data, layout,{displayModeBar: false});
+    }
+    catch (err) {
+      console.error(err)
+      alert(err)
+    }
+  }
+  
+  function isNumber(n){
+    return typeof n == 'number' && !isNaN(n) && isFinite(n);
+ }
+</script>
