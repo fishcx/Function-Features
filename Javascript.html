@@ -270,9 +270,8 @@
            // Evaluating function values
            case 2:
            func = generateForEval();
-           problem = "Evaluate \\(f(x) = "+func.functionPrinted+"\\) at \\(x = "+func.input1+"\\)";
+           problem = "If \\(f(x) = "+func.functionPrinted+"\\), find \\(f("+func.input1+")\\)";
            answer = "\\(f("+func.input1+") = "+func.answer1+"\\)";
-           
            break;
 		  
            // Domain and Range
@@ -406,7 +405,7 @@
           case 1: vT = 0; break;
           
       }
-      
+      // leave linear case 5 out for now
       switch(random(0,4)){
       
          case 0: // abs value
@@ -596,6 +595,35 @@
          range = "(-\\infty , \\infty)";
 
          break; // end cubed root
+
+         case 5: // linear
+         parent = "x";
+         if(hT != 0){ 
+            func += "(x + "+hT+")";
+         }
+         else{
+            func += "x";
+         }
+         
+         if(refl == 0){
+               inc = "(-\\infty , \\infty)";
+               dec = "\\)Never\\(";
+            }
+            else{
+               dec = "(-\\infty , \\infty)";
+               inc = "\\)Never\\(";
+            }
+          
+         domain = "(-\\infty , \\infty)";
+         
+         if(vT != 0){ 
+            func += " + "+vT;
+         }
+         
+         range = "(-\\infty , \\infty)";
+         
+         
+         break; // end cubic
       
       }
       output.parent = parent;
@@ -631,7 +659,7 @@
            num4 = non_zero_random(-5,5);
            num5 = non_zero_random(-5,5);
         
-        switch(random(0,3)){
+        switch(random(0,8)){
 
            case 0: 
            fun = num1+"x^2 + "+num2+"x + "+num3;
@@ -659,6 +687,13 @@
            answer1 = num1*Math.abs(x1+num3)+num2;
            answer2 = num1*Math.abs(x2+num3)+num2;
 
+           break;
+
+           case 4:  case 5: case 6: case 7: case 8:
+           fun = num1+"x + "+num2;
+           answer1 = num1*(x1)+num2;
+           answer2 = num1*(x2)+num2;
+           
            break;
 
         }
