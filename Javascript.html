@@ -269,9 +269,33 @@
            
            // Evaluating function values
            case 2:
-           func = generateForEval();
-           problem = "If \\(f(x) = "+func.functionPrinted+"\\), find \\(f("+func.input1+")\\)";
-           answer = "\\(f("+func.input1+") = "+func.answer1+"\\)";
+
+           switch(random(0,4)){
+              
+              // given a function definition, plug in to find the output value
+              case 0:
+              func = generateForEval();
+              problem = "If \\(f(x) = "+func.functionPrinted+"\\), find \\(f("+func.input1+")\\)";
+              answer = "\\(f("+func.input1+") = "+func.answer1+"\\)";
+              break;
+
+              // given a table, find the output for the right input
+              case 1: case 2: 
+              var funcTable = getFuncTable();
+              problem = "Given \\(f(x)\\) below, find \\(f("+funcTable.inputVal+")\\)";
+              problem += funcTable.printTable;
+              answer = "\\(f("+funcTable.inputVal+") = "+funcTable.outputVal+"\\)";
+              break;
+
+              // given a table, find the input for the right output
+              case 3: case 4:
+              var funcTable = getFuncTable();
+              problem = "Given \\(f(x)\\) below, find \\(x\\) when \\(f(x)="+funcTable.outputVal+"\\)";
+              problem += funcTable.printTable;
+              answer = "\\(x = "+funcTable.inputVal+"\\) since \\(f("+funcTable.inputVal+") = "+funcTable.outputVal+"\\)";
+              break;
+           }
+
            break;
 		  
            // Domain and Range
@@ -332,6 +356,62 @@
        //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
 	}
 	
+    function myRandomInts(quantity, max){
+      const arr = [];
+      while(arr.length < quantity){
+        var candidateInt = random(-1*max, max);
+        if(arr.indexOf(candidateInt) === -1){ arr.push(candidateInt); }
+  }
+return(arr)
+}
+
+    function shuffle(array) {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
+    // generates a function table
+    function getFuncTable(){
+      var tableSize = random(6,10);
+      var randomVals = myRandomInts(tableSize,50);
+      var xVals = [...randomVals];
+      var yVals = shuffle(randomVals);
+
+       var xstring = ""; 
+       var ystring = "";
+           
+       var output = "<table border='1'>";
+       output += "<tr><td>\\(x\\)</td>";
+           
+       for(var i = 0; i < tableSize; i++){
+          xstring += "<td>"+xVals[i]+"</td>";
+          ystring += "<td>"+yVals[i]+"</td>";
+           
+       }
+           
+       output += xstring+"</tr><tr><td>\\(f(x)\\)</td>"+ystring+"</tr>";
+       output += "</table>";
+       
+       var randomIndex = random(0, tableSize-1);
+
+       return {printTable:output, inputVal:xVals[randomIndex],outputVal:yVals[randomIndex]};
+
+    }
+
+
     // generates a function using transformations 
     function generateFunction(){
     
