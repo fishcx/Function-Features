@@ -45,7 +45,8 @@
                          "https://www.youtube.com/watch?v=XX8zD2BTpwU",
                          "https://www.youtube.com/watch?v=fM9JsvhOBBI",
                          "https://www.youtube.com/watch?v=fGRQHaJrjkU",
-                         "https://www.youtube.com/watch?v=n0LU21OnOyQ"];
+                         "https://www.youtube.com/watch?v=n0LU21OnOyQ",
+                         ""];
        
        if(videoLinks[type-1].length != 0){ 
          $("#videoLink"). attr("href", videoLinks[type-1]);
@@ -347,6 +348,28 @@
            answer += "Increasing: \\("+func.increasing+"\\), Decreasing: \\("+func.decreasing+"\\)";
           
            break;
+
+           // Interval & Inequality Notation
+           case 8:
+           var not = generateNotation();
+
+           switch(random(0,1)){
+             
+             // interval to inequality
+             case 0:
+             problem = "Convert "+not.interval+" to inequality notation";
+             answer = not.inequality;
+             break;
+             
+             // inequality to interval
+             case 1:
+             problem = "Convert "+not.inequality+" to interval notation";
+             answer = not.interval;
+             break;
+
+           }
+          
+           break;
        }
             
        $("#generated").html(problem);
@@ -356,6 +379,39 @@
        //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
 	}
 	
+    function generateNotation(){
+
+        var min = random(-100,100);
+        var max = random(1,100)+min;
+
+        var leftInterval, rightInterval, leftIneq, rightIneq, letter, domainRangeWord;
+
+        // open on left, else closed
+        if(random(0,1) == 0){ leftInterval = "("; leftIneq = " < "; } else { leftInterval = "["; leftIneq = " \\leq "; }
+
+        // open on right, else closed
+        if(random(0,1) == 0){ rightInterval = ")"; rightIneq = " < "; } else { rightInterval = "]"; rightIneq = " \\leq ";}
+        
+        // left is neg infinity
+        if(random(0,5) == 0){ min = "-\\infty "; leftInterval = "("; leftIneq = "<";}
+
+        // right is infinity
+        if(random(0,5) == 0){ max = "\\infty "; rightInterval = ")"; rightIneq = "<";}
+
+        min = min.toString();
+        max = max.toString();
+
+        // domain or range
+        if(random(0,1) == 0){ letter = " x "; domainRangeWord = "Domain";} else{ letter = " y "; domainRangeWord = "Range";}
+
+        var intervalNotation = domainRangeWord+": \\("+leftInterval+min+" , "+max+rightInterval+"\\)";
+        var inequalityNotation = "\\("+min+leftIneq+letter+rightIneq+max+"\\)";
+
+        return {interval: intervalNotation, inequality: inequalityNotation};
+
+    }
+
+
     function myRandomInts(quantity, max){
       const arr = [];
       while(arr.length < quantity){
