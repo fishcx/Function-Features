@@ -302,6 +302,8 @@
            // Domain and Range
            case 3: 
            func = generateFunction();
+           draw(func.expression,false);
+           $('#plot').show();
            problem = "Determine the domain and range for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
            answer = "Domain: \\("+func.domain+"\\), Range: \\("+func.range+"\\)<br>";
@@ -311,6 +313,8 @@
            // Increasing and Decreasing
            case 4:
            func = generateFunction();
+           draw(func.expression,false);
+           $('#plot').show();
            problem = "Determine the increasing and decreasing intervals for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
            answer = "Increasing: \\("+func.increasing+"\\), Decreasing: \\("+func.decreasing+"\\)";
@@ -320,6 +324,8 @@
            // Transformations
            case 5:
            func = generateFunction();
+           draw(func.expression,false);
+           $('#plot').show();
            problem = "Determine the parent function and transformations for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
            answer = "Parent function: \\(f(x)="+func.parent+"\\)<br>";
@@ -340,10 +346,12 @@
            // All Key Features
            case 7:
            func = generateFunction();
+           draw(func.expression,false);
+           $('#plot').show();
            problem = "Determine the parent function, transformations, domain, range, and increasing and decreasing intervals for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
            answer = "Parent function: \\(f(x)="+func.parent+"\\)<br>";
-           answer += "Transformations: "+func.transforms+"<br>";
+           answer += "Transformation(s): "+func.transforms+"<br>";
            answer += "Domain: \\("+func.domain+"\\), Range: \\("+func.range+"\\)<br>";
            answer += "Increasing: \\("+func.increasing+"\\), Decreasing: \\("+func.decreasing+"\\)";
           
@@ -471,7 +479,7 @@ return(arr)
     // generates a function using transformations 
     function generateFunction(){
     
-       var output = {functionPrinted:"", parent: "", domain: "", range: "", increasing: "", decreasing: "", transforms: ""};
+       var output = {functionPrinted:"", parent: "", domain: "", range: "", increasing: "", decreasing: "", transforms: "",expression:""};
        var func = "";
        var parent = "";
        var trans = "";
@@ -479,78 +487,59 @@ return(arr)
        var range = "";
        var inc = "";
        var dec = "";
+       var exp = "";
 
       var refl = ""; // reflection over x-axis
       switch(random(0,1)){ 
-       
           case 0: 
              refl = "yes";
              trans += "Reflection over the \\(x\\)-axis;";
              func += "-";
-
+             exp += "-";
           break; 
-          
           case 1: refl = 0; break;
-          
       }
       
       var vS = ""; // vertical strech
       switch(random(0,1)){ 
-       
           case 0: 
              vS = non_zero_random(2,6); 
              trans += " Vertical stretch times "+vS+";";
              func += vS;
-
+             exp += vS+"*";
           break; 
-          
           case 1: vS = "none"; break;
-          
       }
       
       var hT = ""; // horizontal transformation
        switch(random(0,1)){ 
-       
           case 0: 
              hT = non_zero_random(-5,5); 
              trans += " Horizontal shift ";
-           
           if(hT > 0){ trans += "left ";} else { trans += "right ";}
-          
           trans += Math.abs(hT)+" units; ";
-          
           break; 
-          
           case 1: hT = 0; break;
-          
       }
        
        var vT = ""; // vertical transformation
        switch(random(0,1)){ 
-       
           case 0: 
              vT = non_zero_random(-5,5); 
              trans += " Vertical shift ";
-           
           if(vT > 0){ trans += "up ";} else { trans += "down ";}
-          
           trans += Math.abs(vT)+" units; ";
-          
           break; 
-          
           case 1: vT = 0; break;
-          
       }
       // leave linear case 5 out and cubed root case 4 out
       switch(random(0,3)){
-      
          case 0: // abs value
-         
          parent = "|x|";
-         
+  
          if(hT != 0){ 
             func += "|x + "+hT+"|";
-            
+            exp += `abs(x+${hT})`;
             if(refl == 0){
                inc = "("+(-1*hT)+", \\infty)";
                dec = "(-\\infty ,"+(-1*hT)+")";
@@ -562,6 +551,7 @@ return(arr)
          }
          else{
             func += "|x|";
+            exp += "abs(x)";
             if(refl == 0){
                inc = "(0, \\infty)";
                dec = "(-\\infty ,0)";
@@ -576,18 +566,11 @@ return(arr)
          
          if(vT != 0){ 
             func += " + "+vT;
+            exp += `+${vT}`;
          }
          
-         if(refl == 0){
-         
-           range = "["+vT+", \\infty)";
-           
-         }
-         else{
-           
-           range = "(-\\infty , "+vT+"]";
-           
-         }
+         if(refl == 0){    range = "["+vT+", \\infty)"; }
+         else{ range = "(-\\infty , "+vT+"]"; }
 
          break;  // end absolute value
 
@@ -596,7 +579,7 @@ return(arr)
          
          if(hT != 0){ 
             func += "(x + "+hT+")^2";
-            
+            exp += `(x+${hT})^2`;
             if(refl == 0){
                inc = "("+(-1*hT)+", \\infty)";
                dec = "(-\\infty ,"+(-1*hT)+")";
@@ -608,6 +591,7 @@ return(arr)
          }
          else{
             func += "x^2";
+            exp += "x^2";
             if(refl == 0){
                inc = "(0, \\infty)";
                dec = "(-\\infty ,0)";
@@ -619,30 +603,16 @@ return(arr)
          }
           
          domain = "(-\\infty , \\infty)";
-         
-         if(vT != 0){ 
-            func += " + "+vT;
-         }
-         
-         if(refl == 0){
-         
-           range = "["+vT+", \\infty)";
-           
-         }
-         else{
-           range = "(-\\infty , "+vT+"]";
-         }
+         if(vT != 0){   func += " + "+vT; exp += `+${vT}`; }
+         if(refl == 0){ range = "["+vT+", \\infty)";  }
+         else{  range = "(-\\infty , "+vT+"]";  }
          
          break; // end quadratic
          
          case 2: // cubic
          parent = "x^3";
-         if(hT != 0){ 
-            func += "(x + "+hT+")^3";
-         }
-         else{
-            func += "x^3";
-         }
+         if(hT != 0){   func += "(x + "+hT+")^3"; exp += `(x+${hT})^3`; }
+         else{  func += "x^3";  exp += "x^3"; }
          
          if(refl == 0){
                inc = "(-\\infty , \\infty)";
@@ -654,26 +624,15 @@ return(arr)
             }
           
          domain = "(-\\infty , \\infty)";
-         
-         if(vT != 0){ 
-            func += " + "+vT;
-         }
-         
+         if(vT != 0){   func += " + "+vT;  exp += `+${vT}`;  }
          range = "(-\\infty , \\infty)";
-         
-         
          break; // end cubic
          
          case 3: // square root
          parent = "\\sqrt{x}";
          
-         if(hT != 0){ 
-            func += "\\sqrt{x + "+hT+"}";
-
-         }
-         else{
-            func += "\\sqrt{x}";
-         }
+         if(hT != 0){   func += "\\sqrt{x + "+hT+"}"; exp += `sqrt(x+${hT})`; }
+         else{  func += "\\sqrt{x}";  exp += "sqrt(x)"; }
          
          if(refl == 0){
                inc = "("+(-1*hT)+", \\infty)";
@@ -686,32 +645,19 @@ return(arr)
           
          domain = "["+(-1*hT)+" , \\infty)";
          
-         if(vT != 0){ 
-            func += " + "+vT;
-         }
+         if(vT != 0){   func += " + "+vT; exp += `+${vT}`; }
          
-         if(refl == 0){
-         
-           range = "["+vT+", \\infty)";
-           
-         }
-         else{
-           
-           range = "(-\\infty , "+vT+"]";
-           
-         }
+         if(refl == 0){ range = "["+vT+", \\infty)";  }
+         else{  range = "(-\\infty , "+vT+"]";  }
          
          break; // end square root
          
+         /*
          case 4: // cubed root
          parent = "\\sqrt[3]{x}";
          
-         if(hT != 0){ 
-            func += "\\sqrt[3]{x + "+hT+"}";
-         }
-         else{
-            func += "\\sqrt[3]{x}";
-         }
+         if(hT != 0){   func += "\\sqrt[3]{x + "+hT+"}";  }
+         else{  func += "\\sqrt[3]{x}"; }
          
          if(refl == 0){
                inc = "(-\\infty , \\infty)";
@@ -724,9 +670,7 @@ return(arr)
           
          domain = "(-\\infty , \\infty)";
          
-         if(vT != 0){ 
-            func += " + "+vT;
-         }
+         if(vT != 0){   func += " + "+vT;}
          
          range = "(-\\infty , \\infty)";
 
@@ -734,12 +678,8 @@ return(arr)
 
          case 5: // linear
          parent = "x";
-         if(hT != 0){ 
-            func += "(x + "+hT+")";
-         }
-         else{
-            func += "x";
-         }
+         if(hT != 0){   func += "(x + "+hT+")"; }
+         else{  func += "x";  }
          
          if(refl == 0){
                inc = "(-\\infty , \\infty)";
@@ -751,15 +691,12 @@ return(arr)
             }
           
          domain = "(-\\infty , \\infty)";
-         
-         if(vT != 0){ 
-            func += " + "+vT;
-         }
-         
+         if(vT != 0){   func += " + "+vT;}
          range = "(-\\infty , \\infty)";
          
          
          break; // end linear
+         */
       
       }
       output.parent = parent;
@@ -770,6 +707,7 @@ return(arr)
       output.functionPrinted = doublesigns(func);
       if(trans == ""){ trans = "None"; }
       output.transforms = trans;
+      output.expression = exp;
       
       return output;
     }
@@ -948,7 +886,7 @@ return(arr)
       var expr = math.compile(expression)
 
       // evaluate the expression repeatedly for different values of x
-      var xValues = math.range(-11, 11, 0.1).toArray();
+      var xValues = math.range(-11, 11, 0.001).toArray();
       const yValues = xValues.map(function (x) {
         return expr.eval({x: x});
       })
