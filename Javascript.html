@@ -302,7 +302,7 @@
            // Domain and Range
            case 3: 
            func = generateFunction();
-           draw(func.expression,false);
+           draw(func.expression,true,func.vertex);
            $('#plot').show();
            problem = "Determine the domain and range for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
@@ -313,7 +313,7 @@
            // Increasing and Decreasing
            case 4:
            func = generateFunction();
-           draw(func.expression,false);
+           draw(func.expression,true,func.vertex);
            $('#plot').show();
            problem = "Determine the increasing and decreasing intervals for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
@@ -324,7 +324,7 @@
            // Transformations
            case 5:
            func = generateFunction();
-           draw(func.expression,false);
+           draw(func.expression,true,func.vertex);
            $('#plot').show();
            problem = "Determine the parent function and transformations for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
@@ -346,7 +346,7 @@
            // All Key Features
            case 7:
            func = generateFunction();
-           draw(func.expression,false);
+           draw(func.expression,true,func.vertex);
            $('#plot').show();
            problem = "Determine the parent function, transformations, domain, range, and increasing and decreasing intervals for the function <br>";
            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
@@ -479,7 +479,7 @@ return(arr)
     // generates a function using transformations 
     function generateFunction(){
     
-       var output = {functionPrinted:"", parent: "", domain: "", range: "", increasing: "", decreasing: "", transforms: "",expression:""};
+       var output = {functionPrinted:"", parent: "", domain: "", range: "", increasing: "", decreasing: "", transforms: "",expression:"",vertex:[]};
        var func = "";
        var parent = "";
        var trans = "";
@@ -488,6 +488,7 @@ return(arr)
        var inc = "";
        var dec = "";
        var exp = "";
+       var vertexCoords = [0,0];
 
       var refl = ""; // reflection over x-axis
       switch(random(0,1)){ 
@@ -515,6 +516,7 @@ return(arr)
        switch(random(0,1)){ 
           case 0: 
              hT = non_zero_random(-5,5); 
+             vertexCoords[0] = hT*-1;
              trans += " Horizontal shift ";
           if(hT > 0){ trans += "left ";} else { trans += "right ";}
           trans += Math.abs(hT)+" units; ";
@@ -525,7 +527,8 @@ return(arr)
        var vT = ""; // vertical transformation
        switch(random(0,1)){ 
           case 0: 
-             vT = non_zero_random(-5,5); 
+             vT = non_zero_random(-5,5);
+             vertexCoords[1] = vT; 
              trans += " Vertical shift ";
           if(vT > 0){ trans += "up ";} else { trans += "down ";}
           trans += Math.abs(vT)+" units; ";
@@ -708,6 +711,7 @@ return(arr)
       if(trans == ""){ trans = "None"; }
       output.transforms = trans;
       output.expression = exp;
+      output.vertex = vertexCoords;
       
       return output;
     }
@@ -880,28 +884,46 @@ return(arr)
     
  
     // function that draws the graph between -10 and 10
-    function draw(expression,showDots) {
+    function draw(expression,showDots,vertex) {
     try {
       // compile the expression once
       var expr = math.compile(expression)
+      var incr = 0.1; 
+      if(expression.indexOf("sqrt") !== -1){ incr = 0.001; }
 
       // evaluate the expression repeatedly for different values of x
-      var xValues = math.range(-11, 11, 0.001).toArray();
+      var xValues = math.range(-11, 11, incr).toArray();
+
+      for(var i = 0; i < xValues.length; i ++){ 
+          xValues[i] = Math.round(xValues[i]*100)/100;
+      }
+
       const yValues = xValues.map(function (x) {
         return expr.eval({x: x});
       })
+
+      var vertexTrace = {
+        x: [vertex[0]],
+        y: [vertex[1]],
+        type: 'scatter',
+        mode: 'markers',
+        marker: {
+          color: '#3F4591',
+          size: 6
+        },
+        hoverinfo:'none'
+      };
+      
       
       if(showDots){
       
          var xValues2 = [];
          var yValues2 = []
-         for(var i = 0; i < xValues.length; i ++){         
-            var yvalue = expr.eval({x: xValues[i]});
-
+         for(var i = 0; i < xValues.length; i ++){      
                // creates the "pretty points" to graph points at integer y-values
-               if(Number.isInteger(yvalue) && Number.isInteger(xValues[i])){        
+               if(Number.isInteger(yValues[i]) && Number.isInteger(xValues[i])){        
                   xValues2.push(xValues[i]);
-                  yValues2.push(yvalue);        
+                  yValues2.push(yValues[i]);        
                }          
          }    
          
@@ -913,12 +935,13 @@ return(arr)
         mode: 'markers',
         marker: {
           color: '#3F4591',
-          size: 8
+          size: 6
         },
         hoverinfo:'none'
       };
       }
-       
+      
+      
       // render the line using plotly
       var trace1 = {
         x: xValues,
@@ -1049,9 +1072,9 @@ return(arr)
      ];
       
       if(showDots){
-         var data = [trace1,trace2,xTickMarkLabels,yTickMarkLabels,axisMarkers];
+         var data = [trace1,vertexTrace,trace2,xTickMarkLabels,yTickMarkLabels,axisMarkers];
       } else{
-         var data = [trace1,xTickMarkLabels,yTickMarkLabels,axisMarkers];
+         var data = [trace1,vertexTrace,xTickMarkLabels,yTickMarkLabels,axisMarkers];
       }
       Plotly.newPlot('plot', data, layout,{displayModeBar: false});
     }
