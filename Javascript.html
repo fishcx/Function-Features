@@ -301,12 +301,27 @@
 		  
            // Domain and Range
            case 3: 
-           func = generateFunction();
-           draw(func.expression,true,func.vertex);
+
+           switch(random(0,1)){
+            // curve
+            case 0:
+            var cur = generateFuncCurve();
+            drawCurve(cur);
+            answer = `Domain: \\(\[${cur.xmin}, ${cur.xmax}\]\\), Range: \\(\[${cur.ymin}, ${cur.ymax}\]\\)<br>`;
+            break;
+            
+            // function
+            case 1:
+            func = generateFunction();
+            draw(func.expression,true,func.vertex);
+            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
+            answer = "Domain: \\("+func.domain+"\\), Range: \\("+func.range+"\\)<br>";
+            break;
+
+           }
+           
            $('#plot').show();
            problem = "Determine the domain and range for the function <br>";
-           problem += "\\(g(x) = "+func.functionPrinted+"\\)";
-           answer = "Domain: \\("+func.domain+"\\), Range: \\("+func.range+"\\)<br>";
           
            break;
 		   
@@ -475,6 +490,40 @@ return(arr)
 
     }
 
+    // generate function curve
+    function generateFuncCurve(){
+      
+      var xVals = [random(-10,-7),random(-5,-4),random(4,5),random(7,10)];
+      var yVals = [];
+
+      switch(random(0,1)){
+          // start low
+          case 0:
+          yVals[0] = random(-10,-6);
+          yVals[1] = random(yVals[0]+5,10);
+          yVals[2] = random(yVals[1]-5,-10);
+          yVals[3] = random(yVals[2]+5,10);
+          break;
+
+          // start high
+          case 1:
+          yVals[0] = random(6,10);
+          yVals[1] = random(yVals[0]-5,-10);
+          yVals[2] = random(yVals[1]+5,10);
+          yVals[3] = random(yVals[2]-5,-10);
+          break;
+
+      } 
+      var func1= quinticWithExtremaPretty(xVals,yVals);
+      var maxAndMin = getMaxAndMin(func1,xVals[0],xVals[3]);
+
+       do{
+          func1 = quinticWithExtremaPretty(xVals,yVals);
+      } while(maxAndMin.min < -10 || maxAndMin.max > 10); // make sure it stays on grid 
+
+      return {exp: func1, xCoords:xVals, yCoords: yVals, xmin: xVals[0], xmax: xVals[3],ymin: maxAndMin.min, ymax: maxAndMin.max};
+
+    }
 
     // generates a function using transformations 
     function generateFunction(){
@@ -887,7 +936,7 @@ return(arr)
     function draw(expression,showDots,vertex) {
     try {
       // compile the expression once
-      var expr = math.compile(expression)
+      var expr = math.compile(expression);
       var incr = 0.1; 
       if(expression.indexOf("sqrt") !== -1){ incr = 0.001; }
 
@@ -1083,6 +1132,174 @@ return(arr)
       alert(err)
     }
   }
+
+  // function that draws the graph between -10 and 10
+    function drawCurve(curve) {
+    try {
+      
+      // compile the expression once
+      var expr = math.compile(curve.exp);
+      // evaluate the expression repeatedly for different values of x
+      var xValues = math.range(curve.xCoords[0], curve.xCoords[curve.xCoords.length-1], 0.1).toArray();
+      
+      for(var i = 0; i < xValues.length; i ++){ 
+          xValues[i] = Math.round(xValues[i]*100)/100;
+      }
+      
+      const yValues = xValues.map(function (x) {
+        return expr.eval({x: x});
+      });
+      
+      // render the graph using plotly
+      var trace1 = {
+        x: xValues,
+        y: yValues,
+        type: 'scatter',
+        mode: 'lines',        
+        line: {
+          color: '#3F4591',
+          width: 2
+        },
+        name:"",
+      };
+
+      // render the "pretty points" using plotly
+      var trace2 = {
+        x: curve.xCoords,
+        y: curve.yCoords,
+        type: 'scatter',
+        mode: 'markers',
+        marker: {
+          color: '#3F4591',
+          size: 6
+        },
+        hoverinfo:'none'
+      };
+   
+      var axis_template ={
+        showgrid: true,
+        zeroline: true,
+        nticks: 23,
+        range: [-11,11], 
+        gridcolor: '#bdbdbd', //grid color
+        gridwidth: 1.2, //grid width
+        zerolinecolor: 'black', // axes color
+        zerolinewidth: 1.5, // axes widths
+        showticklabels:false
+      };        
+      
+      var axisMarkers =   {
+        x: [-0.25,10.75],
+        y: [10.75,-0.25],
+        mode: 'text',
+        text:["y","x"],
+        textposition:["left","bottom"],
+        textfont: {
+          size:18,
+        },
+        hoverinfo:'none'
+      };
+
+      // make grid smaller for mobile
+      var gridsize;
+      var indent;
+      // gridsize= Math.min(.95*window.innerWidth,550);
+      
+      if(window.innerWidth > 601){
+         gridsize = 550;
+         indent = 20;
+      }else{
+         gridsize = 350;
+         indent = 0;
+      }
+      
+      var xTickMarkLabels =   {
+        x: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        y: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"bottom",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };   
+      
+      var yTickMarkLabels =   {
+        y: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        x: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"left",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };
+      
+      var layout = {
+        xaxis:axis_template,
+        yaxis:axis_template,
+        showlegend: false,
+        width: gridsize,
+        height: gridsize,
+        hovermode: 'closest',   
+        font:{size: 18},
+        margin: {l: indent,  r: 30, t: 20}
+      };
+      
+      layout.annotations= [
+      {
+         x: 0,
+         y: 11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: 35
+       },
+       {
+         x: 0,
+         y: -11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: -35
+       },
+       {
+         x: 11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: -35,
+         ay: 0
+       },
+       {
+         x: -11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 35,
+         ay: 0
+       }
+
+     ];
+      
+      var data = [trace1,trace2,xTickMarkLabels,yTickMarkLabels,axisMarkers];
+      Plotly.newPlot('plot', data, layout,{displayModeBar: false});
+    }
+    catch (err) {
+      console.error(err)
+      alert(err)
+    }
+  }
   
   // function that draws the graph between -10 and 10
     function drawMultiple(expression1, expression2) {
@@ -1265,7 +1482,97 @@ return(arr)
       alert(err)
     }
   }
-  
+
+function getMaxAndMin(func,xmin,xmax){
+
+var expr = math.compile(func); 
+// evaluate the expression repeatedly for different values of x
+var xValues = math.range(xmin, xmax, 0.1).toArray();
+      
+for(var i = 0; i < xValues.length; i ++){ 
+   xValues[i] = Math.round(xValues[i]*100)/100;
+}
+      
+      const yValues = xValues.map(function (x) {
+        return expr.eval({x: x});
+      });
+var maxValue = -100;
+var minValue = 100;
+
+for (let i = 0; i < xValues.length; i++) {
+    const y = yValues[i];
+
+    if (y > maxValue) {
+        maxValue = y;
+    }
+    if (y < minValue){
+        minValue = y;
+    }
+}
+  return {min: Math.round(minValue), max: Math.round(maxValue)};
+}
+
+  function quinticWithExtremaPretty(xs, ys) {
+  const [x0, x1, x2, x3] = xs;
+  const [y0, y1, y2, y3] = ys;
+
+  const A = [
+    [x0**5, x0**4, x0**3, x0**2, x0, 1],    // f(x0) = y0
+    [x1**5, x1**4, x1**3, x1**2, x1, 1],    // f(x1) = y1
+    [5*x1**4, 4*x1**3, 3*x1**2, 2*x1, 1, 0],// f'(x1) = 0
+    [x2**5, x2**4, x2**3, x2**2, x2, 1],    // f(x2) = y2
+    [5*x2**4, 4*x2**3, 3*x2**2, 2*x2, 1, 0],// f'(x2) = 0
+    [x3**5, x3**4, x3**3, x3**2, x3, 1]     // f(x3) = y3
+  ];
+  const B = [y0, y1, 0, y2, 0, y3];
+
+  // Gaussian elimination
+  function solve(A, B) {
+    const n = A.length;
+    const M = A.map((row, i) => [...row, B[i]]);
+    for (let i = 0; i < n; i++) {
+      let maxRow = i;
+      for (let k = i+1; k < n; k++) {
+        if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) maxRow = k;
+      }
+      [M[i], M[maxRow]] = [M[maxRow], M[i]];
+      let div = M[i][i];
+      if (Math.abs(div) < 1e-12) throw new Error("No unique solution");
+      for (let j = i; j <= n; j++) M[i][j] /= div;
+      for (let k = 0; k < n; k++) {
+        if (k === i) continue;
+        let factor = M[k][i];
+        for (let j = i; j <= n; j++) M[k][j] -= factor * M[i][j];
+      }
+    }
+    return M.map(row => row[n]);
+  }
+
+  const coeffs = solve(A, B);
+
+  // Pretty-print polynomial
+  function prettyPrint(coeffs) {
+    const vars = ["x^5", "x^4", "x^3", "x^2", "x", ""];
+    let parts = [];
+    coeffs.forEach((c, i) => {
+      if (Math.abs(c) < 1e-10) return; // skip ~0
+      const coeff = Math.round(c * 1e6) / 1e6; // round
+      const sign = coeff >= 0 ? (parts.length ? " + " : "") : " - ";
+      const absCoeff = Math.abs(coeff);
+      if (vars[i] === "") {
+        parts.push(sign + absCoeff);
+      } else if (absCoeff === 1) {
+        parts.push(sign + vars[i]);
+      } else {
+        parts.push(sign + absCoeff + vars[i].replace("^1", ""));
+      }
+    });
+    return parts.join("");
+  }
+
+  return prettyPrint(coeffs);
+}
+
   function isNumber(n){
     return typeof n == 'number' && !isNaN(n) && isFinite(n);
  }
