@@ -178,7 +178,7 @@
                case 14:
                var line = getLinear();
                var exp = line.n/line.d+"x + "+line.b;
-               draw(exp,false);
+               draw(exp,false,"");
                $('#plot').show();
                problem = "";
                answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
@@ -190,7 +190,7 @@
                b = random(-5,5);
                c = random(-5,5);
                var exp = a+"x^2 + "+b+"x +"+c;
-               draw(exp,false);
+               draw(exp,false,"");
                $('#plot').show();
                problem = "";
                answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
@@ -221,7 +221,7 @@
                  r = random(2,5);               
                } while(((a+r)>10) || ((a-r)<-10) || ((b+r)>10) || ((b-r)<-10));
                var exp = "("+r+"^2 - (x-"+a+")^2)^0.5+"+b;      
-               draw(exp);        
+               draw(exp,false,"");        
                $('#plot').show();
                problem = "";
                answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
@@ -233,7 +233,7 @@
                b = random(1,5);
                c = random(1,9);
                var exp = a+"*("+b+"/"+c+")^x";      
-               draw(exp);        
+               draw(exp,false,"");        
                $('#plot').show();
                problem = "";
                answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
@@ -258,7 +258,7 @@
                b = random(-5,5);
                c = random(-5,5);
                var exp = a+"x^3 + "+b+"x +"+c;
-               draw(exp,false);
+               draw(exp,false,"");
                $('#plot').show();
                problem = "";
                answer = "Yes, this is a function since each input, \\(x\\), has only 1 output, \\(y\\). It passes the vertical line test.";
@@ -951,6 +951,7 @@ return(arr)
         return expr.eval({x: x});
       })
 
+      if(vertex != ""){
       var vertexTrace = {
         x: [vertex[0]],
         y: [vertex[1]],
@@ -962,7 +963,7 @@ return(arr)
         },
         hoverinfo:'none'
       };
-      
+      }
       
       if(showDots){
       
@@ -1119,12 +1120,10 @@ return(arr)
        }
 
      ];
-      
-      if(showDots){
-         var data = [trace1,vertexTrace,trace2,xTickMarkLabels,yTickMarkLabels,axisMarkers];
-      } else{
-         var data = [trace1,vertexTrace,xTickMarkLabels,yTickMarkLabels,axisMarkers];
-      }
+     var data = [trace1,xTickMarkLabels,yTickMarkLabels,axisMarkers];
+      if(vertex != ""){ data.push(vertexTrace); }
+      if(showDots){ data.push(trace2); }
+         
       Plotly.newPlot('plot', data, layout,{displayModeBar: false});
     }
     catch (err) {
