@@ -1488,7 +1488,7 @@ var expr = math.compile(func);
 // evaluate the expression repeatedly for different values of x
 var xValues = math.range(xmin, xmax, 0.1).toArray();
       
-for(var i = 0; i < xValues.length; i ++){ 
+for(var i = 0; i < xValues.length-1; i ++){ 
    xValues[i] = Math.round(xValues[i]*100)/100;
 }
       
@@ -1508,7 +1508,8 @@ for (let i = 0; i < xValues.length; i++) {
         minValue = y;
     }
 }
-  return {min: Math.round(minValue), max: Math.round(maxValue)};
+  return {min: Math.round(minValue*10)/10, max: Math.round(maxValue*10)/10};
+ 
 }
 
   function quinticWithExtremaPretty(xs, ys) {
