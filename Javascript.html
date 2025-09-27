@@ -307,7 +307,10 @@
             case 0:
             var cur = generateFuncCurve();
             drawCurve(cur);
-            answer = `Domain: \\(\[${cur.xmin}, ${cur.xmax}\]\\), Range: \\(\[${cur.ymin}, ${cur.ymax}\]\\)<br>`;
+            //createInterval(min,incMin,max,incMax,variable){
+            var domain = createInterval(cur.xmin,true,cur.xmax,true,"x");
+            var range = createInterval(cur.ymin,true,cur.ymax,true,"y");
+            answer = `Domain: \\(${domain}\\), Range: \\(${range}\\)`;
             break;
             
             // function
@@ -593,36 +596,40 @@ return(arr)
             func += "|x + "+hT+"|";
             exp += `abs(x+${hT})`;
             if(refl == 0){
-               inc = "("+(-1*hT)+", \\infty)";
-               dec = "(-\\infty ,"+(-1*hT)+")";
+               inc = createInterval((-1*hT),false,"\\infty",false,"x");
+               dec = createInterval("-\\infty",false,(-1*hT),false,"x");
             }
             else{
-               dec = "("+(-1*hT)+", \\infty)";
-               inc = "(-\\infty ,"+(-1*hT)+")";
+               dec = createInterval((-1*hT),false,"\\infty",false,"x");
+               inc = createInterval("-\\infty",false,(-1*hT),false,"x");
             }
          }
          else{
             func += "|x|";
             exp += "abs(x)";
             if(refl == 0){
-               inc = "(0, \\infty)";
-               dec = "(-\\infty ,0)";
+               inc = createInterval("0",false,"\\infty",false,"x");
+               dec = createInterval("-\\infty",false,"0",false,"x");
             }
             else{
-               dec = "(0, \\infty)";
-               inc = "(-\\infty ,0)";
+               dec = createInterval("0",false,"\\infty",false,"x");
+               inc = createInterval("-\\infty",false,"0",false,"x");
             }
          }
           
-         domain = "(-\\infty , \\infty)";
-         
+         domain = createInterval("-\\infty",false,"\\infty",false,"x");
+
          if(vT != 0){ 
             func += " + "+vT;
             exp += `+${vT}`;
          }
          
-         if(refl == 0){    range = "["+vT+", \\infty)"; }
-         else{ range = "(-\\infty , "+vT+"]"; }
+         if(refl == 0){    
+          range = createInterval(vT,true,"\\infty",false,"y");
+         }
+         else{ 
+          range = createInterval("-\\infty",false,vT,true,"y");
+         }
 
          break;  // end absolute value
 
@@ -633,32 +640,37 @@ return(arr)
             func += "(x + "+hT+")^2";
             exp += `(x+${hT})^2`;
             if(refl == 0){
-               inc = "("+(-1*hT)+", \\infty)";
-               dec = "(-\\infty ,"+(-1*hT)+")";
+               inc = createInterval((-1*hT),false,"\\infty",false,"x");
+               dec = createInterval("-\\infty",false,(-1*hT),false,"x");
             }
             else{
-               dec = "("+(-1*hT)+", \\infty)";
-               inc = "(-\\infty ,"+(-1*hT)+")";
+               dec = createInterval((-1*hT),false,"\\infty",false,"x");
+               inc = createInterval("-\\infty",false,(-1*hT),false,"x");
             }
          }
          else{
             func += "x^2";
             exp += "x^2";
             if(refl == 0){
-               inc = "(0, \\infty)";
-               dec = "(-\\infty ,0)";
+               inc = createInterval("0",false,"\\infty",false,"x");
+               dec = createInterval("-\\infty",false,"0",false,"x");
             }
             else{
-               dec = "(0, \\infty)";
-               inc = "(-\\infty ,0)";
+               dec = createInterval("0",false,"\\infty",false,"x");
+               inc = createInterval("-\\infty",false,"0",false,"x");
             }
          }
           
-         domain = "(-\\infty , \\infty)";
+         domain = createInterval("-\\infty",false,"\\infty",false,"x");
+
          if(vT != 0){   func += " + "+vT; exp += `+${vT}`; }
-         if(refl == 0){ range = "["+vT+", \\infty)";  }
-         else{  range = "(-\\infty , "+vT+"]";  }
          
+         if(refl == 0){   
+          range = createInterval(vT,true,"\\infty",false,"y");
+         }
+         else{ 
+          range = createInterval("-\\infty",false,vT,true,"y");
+         }
          break; // end quadratic
          
          case 2: // cubic
@@ -667,17 +679,19 @@ return(arr)
          else{  func += "x^3";  exp += "x^3"; }
          
          if(refl == 0){
-               inc = "(-\\infty , \\infty)";
+               inc = createInterval("-\\infty",false,"\\infty",false,"x");
                dec = "\\)Never\\(";
             }
             else{
-               dec = "(-\\infty , \\infty)";
+               dec = createInterval("-\\infty",false,"\\infty",false,"x");
                inc = "\\)Never\\(";
             }
-          
-         domain = "(-\\infty , \\infty)";
+         
+         domain = createInterval("-\\infty",false,"\\infty",false,"x");
+
          if(vT != 0){   func += " + "+vT;  exp += `+${vT}`;  }
-         range = "(-\\infty , \\infty)";
+         
+         range = createInterval("-\\infty",false,"\\infty",false,"y");
          break; // end cubic
          
          case 3: // square root
@@ -687,21 +701,25 @@ return(arr)
          else{  func += "\\sqrt{x}";  exp += "sqrt(x)"; }
          
          if(refl == 0){
-               inc = "("+(-1*hT)+", \\infty)";
+               inc = createInterval((-1*hT),false,"\\infty",false,"x");
                dec = "\\)Never\\(";
             }
             else{
-               dec = "("+(-1*hT)+", \\infty)";
+               dec = createInterval((-1*hT),false,"\\infty",false,"x");
                inc = "\\)Never\\(";
             }
-          
-         domain = "["+(-1*hT)+" , \\infty)";
+         
+         domain = createInterval((-1*hT),true,"\\infty",false,"x");
          
          if(vT != 0){   func += " + "+vT; exp += `+${vT}`; }
          
-         if(refl == 0){ range = "["+vT+", \\infty)";  }
-         else{  range = "(-\\infty , "+vT+"]";  }
-         
+         if(refl == 0){      
+          range = createInterval(vT,true,"\\infty",false,"y");
+         }
+         else{ 
+          range = createInterval("-\\infty",false,vT,true,"y");
+         }
+
          break; // end square root
          
          /*
@@ -1511,6 +1529,32 @@ for (let i = 0; i < xValues.length; i++) {
   return {min: Math.round(minValue*10)/10, max: Math.round(maxValue*10)/10};
  
 }
+
+  function createInterval(min,incMin,max,incMax,variable){
+    var output = "";
+    var firstSymb = "";
+    var secondSym = "";
+
+    switch(random(0,1)){
+      // interval
+      case 0:
+        if(incMin){ output += "\[";  } else { output += "\("; }
+        output += `${min},${max}`;
+        if(incMax){ output += "\]"; } else { output += "\)"; }
+      break;
+
+      inequality
+      case 1:
+        output += `${min}`;
+        if(incMin){ output += "\\leq";  } else { output += "<"; }
+        output += ` ${variable} `;
+        if(incMax){ output += "\\leq"; } else { output += "<"; }
+        output += `${max}`;
+      break;
+
+    }
+    return output;
+  }
 
   function quinticWithExtremaPretty(xs, ys) {
   const [x0, x1, x2, x3] = xs;
