@@ -307,7 +307,6 @@
             case 0:
             var cur = generateFuncCurve();
             drawCurve(cur);
-            //createInterval(min,incMin,max,incMax,variable){
             var domain = createInterval(cur.xmin,true,cur.xmax,true,"x");
             var range = createInterval(cur.ymin,true,cur.ymax,true,"y");
             answer = `Domain: \\(${domain}\\), Range: \\(${range}\\)`;
@@ -330,12 +329,28 @@
 		   
            // Increasing and Decreasing
            case 4:
-           func = generateFunction();
-           draw(func.expression,true,func.vertex);
-           $('#plot').show();
            problem = "Determine the increasing and decreasing intervals for the function <br>";
-           problem += "\\(g(x) = "+func.functionPrinted+"\\)";
-           answer = "Increasing: \\("+func.increasing+"\\), Decreasing: \\("+func.decreasing+"\\)";
+
+           switch(random(0,1)){
+
+            // curve
+            case 0 :
+            var cur = generateFuncCurve();
+            drawCurve(cur);
+            answer = findIncDecIntervals(cur.exp,cur.xmin,cur.xmax);
+            break;
+
+            // function
+            case 1 :
+            func = generateFunction();
+            draw(func.expression,true,func.vertex);
+            problem += "\\(g(x) = "+func.functionPrinted+"\\)";
+            answer = "Increasing: \\("+func.increasing+"\\), Decreasing: \\("+func.decreasing+"\\)";
+            break;
+
+          }
+
+           $('#plot').show();
           
            break;
            
@@ -495,9 +510,10 @@ return(arr)
 
     // generate function curve
     function generateFuncCurve(){
-      
-      var xVals = [random(-10,-7),random(-5,-4),random(4,5),random(7,10)];
-      var yVals = [];
+
+       do{
+        var xVals = [random(-10,-7),random(-5,-4),random(4,5),random(7,10)];
+       var yVals = [];
 
       switch(random(0,1)){
           // start low
@@ -519,10 +535,9 @@ return(arr)
       } 
       var func1= quinticWithExtremaPretty(xVals,yVals);
       var maxAndMin = getMaxAndMin(func1,xVals[0],xVals[3]);
+      func1 = quinticWithExtremaPretty(xVals,yVals); 
 
-       do{
-          func1 = quinticWithExtremaPretty(xVals,yVals);
-      } while(maxAndMin.min < -10 || maxAndMin.max > 10); // make sure it stays on grid 
+      } while(maxAndMin.min < -10 || maxAndMin.max > 10 || countIncDecIntervals(func1,xVals[0],xVals[3]) > 3); // make sure it stays on grid and doesnt have too many turning points
 
       return {exp: func1, xCoords:xVals, yCoords: yVals, xmin: xVals[0], xmax: xVals[3],ymin: maxAndMin.min, ymax: maxAndMin.max};
 
@@ -1620,4 +1635,217 @@ for (let i = 0; i < xValues.length; i++) {
   function isNumber(n){
     return typeof n == 'number' && !isNaN(n) && isFinite(n);
  }
+
+ function parsePolynomial(funcStr) {
+  // Normalize and split terms robustly (supports decimals)
+  let s = funcStr.replace(/\s+/g, '');
+  // Ensure '-' is treated as a separator, but keep leading '-'
+  if (s[0] !== '-') s = s.replace(/-/g, '+-');
+  else s = s[0] + s.slice(1).replace(/-/g, '+-');
+  // Split on '+' and remove empties
+  const parts = s.split('+').filter(Boolean);
+
+  const terms = parts.map(part => {
+    if (part.includes('x')) {
+      const [coeffPart, powPart = ''] = part.split('x');
+      let coeff;
+      if (coeffPart === '' || coeffPart === '+') coeff = 1;
+      else if (coeffPart === '-') coeff = -1;
+      else coeff = parseFloat(coeffPart);
+      const power = powPart.startsWith('^') ? parseInt(powPart.slice(1), 10) : 1;
+      return { coeff: coeff || 0, power: power || 0 };
+    } else {
+      // constant
+      return { coeff: parseFloat(part), power: 0 };
+    }
+  });
+
+  // Combine like terms and sort descending power
+  const map = {};
+  terms.forEach(({ coeff, power }) => {
+    map[power] = (map[power] || 0) + coeff;
+  });
+  const combined = Object.keys(map).map(k => ({ power: parseInt(k, 10), coeff: map[k] })).filter(t => Math.abs(t.coeff) > 0);
+  combined.sort((a, b) => b.power - a.power);
+  return combined;
+}
+
+function derivativeTerms(terms) {
+  return terms
+    .map(({ coeff, power }) => (power === 0 ? null : { coeff: coeff * power, power: power - 1 }))
+    .filter(Boolean)
+    .sort((a, b) => b.power - a.power);
+}
+
+// Convert sparse term list to descriptor array of coefficients [a_n, a_{n-1}, ..., a_0]
+function termsToDescCoeffs(terms) {
+  if (!terms.length) return [0];
+  const maxP = Math.max(...terms.map(t => t.power));
+  const map = {};
+  terms.forEach(t => (map[t.power] = t.coeff));
+  const coeffs = [];
+  for (let p = maxP; p >= 0; p--) coeffs.push(map[p] || 0);
+  return coeffs;
+}
+
+// Horner evaluation: coeffsDesc = [a_n, a_{n-1},...,a_0]
+function evalPolyDesc(coeffsDesc, x) {
+  let res = 0;
+  for (let i = 0; i < coeffsDesc.length; i++) {
+    res = res * x + coeffsDesc[i];
+  }
+  return res;
+}
+
+// Deduplicate roots close to each other
+function uniqueSorted(arr, tol = 1e-8) {
+  arr.sort((a, b) => a - b);
+  const out = [];
+  for (const v of arr) {
+    if (!out.length || Math.abs(out[out.length - 1] - v) > tol) out.push(v);
+  }
+  return out;
+}
+
+// ---------- Root finding for derivative polynomial ----------
+function findRealRootsInDomain(derivCoeffsDesc, domainStart, domainEnd, options = {}) {
+  const N = options.samples || 2000;
+  const tol = options.rootTol || 1e-10;
+  const evalF = x => evalPolyDesc(derivCoeffsDesc, x);
+
+  // build second derivative coefficients for Newton (if needed)
+  // convert derivCoeffsDesc back to sparse terms to compute second derivative easily
+  // Instead compute derivative of polynomial coefficients directly:
+  const deg = derivCoeffsDesc.length - 1; // highest power of derivative poly
+  const secondCoeffs = [];
+  for (let i = 0; i < derivCoeffsDesc.length - 1; i++) {
+    // derivCoeffsDesc[i] corresponds to coeff for x^(deg - i)
+    const power = deg - i;
+    secondCoeffs.push(derivCoeffsDesc[i] * power);
+  }
+  const evalFprime = x => (secondCoeffs.length ? evalPolyDesc(secondCoeffs, x) : 0);
+
+  const roots = [];
+  const a = Math.min(domainStart, domainEnd);
+  const b = Math.max(domainStart, domainEnd);
+  // sampling points
+  let prevX = a;
+  let prevY = evalF(prevX);
+
+  // if endpoint is almost root, capture it
+  if (Math.abs(prevY) < tol) roots.push(prevX);
+
+  for (let i = 1; i <= N; i++) {
+    const x = a + (i / N) * (b - a);
+    const y = evalF(x);
+
+    // sign change -> bisection
+    if (prevY * y < 0) {
+      let left = prevX, right = x, fl = prevY, fr = y;
+      for (let iter = 0; iter < 60; iter++) {
+        const mid = (left + right) / 2;
+        const fm = evalF(mid);
+        if (Math.abs(fm) < tol) { left = right = mid; break; }
+        if (fl * fm <= 0) { right = mid; fr = fm; } else { left = mid; fl = fm; }
+      }
+      roots.push((left + right) / 2);
+    } else {
+      // no sign change; but if value near zero, try Newton refinement
+      if (Math.abs(y) < 1e-6) {
+        // Newton with safeguarding
+        let xr = x;
+        let converged = false;
+        for (let it = 0; it < 50; it++) {
+          const fx = evalF(xr);
+          const fpx = evalFprime(xr);
+          if (Math.abs(fx) < tol) { converged = true; break; }
+          if (Math.abs(fpx) < 1e-14) break; // derivative too small
+          const dx = fx / fpx;
+          xr = xr - dx;
+          if (!isFinite(xr) || xr < a - (b - a) * 0.1 || xr > b + (b - a) * 0.1) break;
+          if (Math.abs(dx) < 1e-12) { converged = true; break; }
+        }
+        if (converged && xr >= a - 1e-12 && xr <= b + 1e-12 && Math.abs(evalF(xr)) < 1e-6) {
+          roots.push(xr);
+        } else {
+          // also try if prev point is nearly zero
+          if (Math.abs(prevY) < 1e-8) roots.push(prevX);
+          else if (Math.abs(y) < 1e-8) roots.push(x);
+        }
+      }
+    }
+
+    prevX = x; prevY = y;
+  }
+
+  // check endpoint b
+  const yb = evalF(b);
+  if (Math.abs(yb) < tol) roots.push(b);
+
+  // deduplicate and keep inside domain bounds
+  const uniq = uniqueSorted(roots).filter(r => r >= a - 1e-9 && r <= b + 1e-9);
+  return uniq;
+}
+
+// ---------- Main: find intervals ----------
+function findIncreasingDecreasingIntervals(polynomialStr, domainStart, domainEnd) {
+  // Normalize domain order
+  if (domainEnd < domainStart) {
+    const tmp = domainStart; domainStart = domainEnd; domainEnd = tmp;
+  }
+
+  // Parse & derivative
+  const terms = parsePolynomial(polynomialStr);
+  const derivTerms = derivativeTerms(terms);
+
+  // If derivative is zero polynomial -> function is constant on domain
+  if (!derivTerms.length) {
+    return { criticalPoints: [], intervals: [{ interval: [domainStart, domainEnd], behavior: "constant" }] };
+  }
+
+  const derivCoeffsDesc = termsToDescCoeffs(derivTerms);
+  const secondDerivTerms = derivativeTerms(derivTerms);
+  const secondCoeffsDesc = termsToDescCoeffs(secondDerivTerms);
+
+  // Find critical points numerically
+  const critPoints = findRealRootsInDomain(derivCoeffsDesc, domainStart, domainEnd, { samples: 3000 });
+
+  // Build sorted set of points (including boundaries)
+  const points = uniqueSorted([domainStart, ...critPoints, domainEnd], 1e-10);
+
+  // Build intervals and test with derivative value at midpoint
+  const intervals = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const left = points[i];
+    const right = points[i + 1];
+    if (Math.abs(right - left) < 1e-14) continue;
+    const mid = (left + right) / 2;
+    const slope = evalPolyDesc(derivCoeffsDesc, mid);
+    let behavior;
+    if (slope > 1e-12) behavior = "increasing";
+    else if (slope < -1e-12) behavior = "decreasing";
+    else behavior = "flat"; // extremely small derivative at midpoint
+    intervals.push({ interval: [left, right], behavior, slope });
+  }
+
+  return { criticalPoints: critPoints, intervals };
+}
+
+function findIncDecIntervals(funcStr, domainStart, domainEnd){
+
+  var intervals = findIncreasingDecreasingIntervals(funcStr, domainStart, domainEnd).intervals;
+  var output = "";
+
+  for(var i = 0; i < intervals.length; i++){
+      var temp = createInterval(Math.round(intervals[i].interval[0]*10)/10,false,Math.round(intervals[i].interval[1]*10)/10,false,"x");
+      if(output != ""){ output += ", "; }
+      output += `${intervals[i].behavior}: \\(${temp}\\)`;
+
+  }
+  return output;
+}
+
+function countIncDecIntervals(funcStr, domainStart, domainEnd){
+  return findIncreasingDecreasingIntervals(funcStr, domainStart, domainEnd).intervals.length;
+}
 </script>
